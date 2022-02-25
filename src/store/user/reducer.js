@@ -1,4 +1,10 @@
-import { LOG_OUT, LOGIN_SUCCESS, TOKEN_STILL_VALID } from "./actions";
+/* eslint-disable import/no-anonymous-default-export */
+import {
+  LOG_OUT,
+  LOGIN_SUCCESS,
+  TOKEN_STILL_VALID,
+  STORY_DELETE_SUCCESS,
+} from "./actions";
 
 const initialState = {
   token: localStorage.getItem("token"),
@@ -18,6 +24,21 @@ export default (state = initialState, action) => {
 
     case TOKEN_STILL_VALID:
       return { ...state, ...action.payload };
+
+    case STORY_DELETE_SUCCESS:
+      console.log("STORY_DELETE_SUCCESS reducer!!!!", action.payload);
+      const newState = { ...state };
+      console.log("what is new state", newState);
+
+      return {
+        ...state,
+        space: {
+          ...state.space,
+          stories: state.space.stories.filter(
+            (story) => action.payload !== story.id
+          ),
+        },
+      };
 
     default:
       return state;

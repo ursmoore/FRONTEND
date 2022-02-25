@@ -1,6 +1,6 @@
 import { apiUrl } from "../../config/constants";
 import axios from "axios";
-import { selectToken } from "./selectors";
+import { selectToken, selectUser } from "./selectors";
 import {
   appLoading,
   appDoneLoading,
@@ -11,6 +11,7 @@ import {
 export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const TOKEN_STILL_VALID = "TOKEN_STILL_VALID";
 export const LOG_OUT = "LOG_OUT";
+export const STORY_DELETE_SUCCESS = "STORY_DELETE_SUCCESS";
 
 const loginSuccess = (userWithToken) => {
   return {
@@ -23,6 +24,11 @@ const tokenStillValid = (userWithoutToken) => ({
   type: TOKEN_STILL_VALID,
   payload: userWithoutToken,
 });
+
+// export const storyDeleteSuccess = (storyId) => ({
+//   type: STORY_DELETE_SUCCESS,
+//   payload: storyId,
+// });
 
 export const logOut = () => ({ type: LOG_OUT });
 
@@ -106,6 +112,62 @@ export const getUserWithStoredToken = () => {
       // get rid of the token by logging out
       dispatch(logOut());
       dispatch(appDoneLoading());
+    }
+  };
+};
+
+// export const deleteStory = (storyId) => {
+//   return async (dispatch, getState) => {
+//     console.log("i am here");
+//     dispatch(appLoading());
+//     const { space, token } = selectUser(getState());
+//     console.log("whats space ", space, "and token", token);
+//     const spaceId = space.id;
+
+//     try {
+//       const response = await axios.delete(
+//         `/spaces/${spaceId}/stories/${storyId}`,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         }
+//       );
+//       console.log("Story deleted?", response.data);
+//       dispatch(storyDeleteSuccess(storyId));
+//       dispatch(appDoneLoading());
+//     } catch (e) {
+//       console.error(e);
+//     }
+//   };
+// };
+
+// STORY-DELETE ACTION CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+export const storyDeleteSuccess = (storyId) => ({
+  type: STORY_DELETE_SUCCESS,
+  payload: storyId,
+});
+
+export const deleteStory = (id) => {
+  return async (dispatch, getState) => {
+    const { token } = selectUser(getState());
+    console.log("token", token);
+    //const spaceId = space.id;
+
+    try {
+      const response = await axios.delete(
+        `${apiUrl}/spaces/delete/stories/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Story deleted?", response.data);
+      dispatch(storyDeleteSuccess(id));
+      dispatch(appDoneLoading());
+    } catch (e) {
+      console.error(e);
     }
   };
 };

@@ -1,20 +1,22 @@
 import React from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectToken } from "../../store/user/selectors";
-import {
-  selectSpaceDetails,
-  selectUserSpace,
-} from "../../store/spaceReducer/selectors";
+import { deleteStory } from "../../store/user/actions";
+import { selectUserSpace } from "../../store/spaceReducer/selectors";
+import { selectUser } from "../../store/user/selectors";
 
 const MySpace = () => {
+  const dispatch = useDispatch();
   const spaceDetails = useSelector(selectUserSpace);
-  console.log("space details", spaceDetails);
+  // console.log("space details", spaceDetails);
 
+  // const userIdToDelete = useSelector(selectUser);
+  //console.log("user id to delete", userIdToDelete.id);
   const token = useSelector(selectToken);
   const navigate = useNavigate();
-  console.log("what is token", token);
+  // console.log("what is token", token);
   useEffect(() => {
     if (!token) {
       navigate("/");
@@ -23,7 +25,7 @@ const MySpace = () => {
 
   return spaceDetails ? (
     <div>
-      <div>My spacey space</div>
+      <h1>My spacey space</h1>
       <div>
         <div
           key={spaceDetails.id}
@@ -38,9 +40,12 @@ const MySpace = () => {
             .map((story) => {
               return (
                 <div key={story.id}>
-                  <h2>{story.name}</h2>
-                  <p>{story.content}</p>
+                  <h1>{story.name}</h1>
                   <img src={story.imageUrl} alt={story.name} width="400" />
+                  <p>{story.content}</p>
+                  <button onClick={() => dispatch(deleteStory(story.id))}>
+                    DELETE STORY
+                  </button>
                 </div>
               );
             })}
