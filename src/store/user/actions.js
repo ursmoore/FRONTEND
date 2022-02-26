@@ -12,6 +12,7 @@ export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
 export const TOKEN_STILL_VALID = "TOKEN_STILL_VALID";
 export const LOG_OUT = "LOG_OUT";
 export const STORY_DELETE_SUCCESS = "STORY_DELETE_SUCCESS";
+export const ADD_STORY = "ADD_STORY";
 
 const loginSuccess = (userWithToken) => {
   return {
@@ -24,11 +25,6 @@ const tokenStillValid = (userWithoutToken) => ({
   type: TOKEN_STILL_VALID,
   payload: userWithoutToken,
 });
-
-// export const storyDeleteSuccess = (storyId) => ({
-//   type: STORY_DELETE_SUCCESS,
-//   payload: storyId,
-// });
 
 export const logOut = () => ({ type: LOG_OUT });
 
@@ -116,32 +112,6 @@ export const getUserWithStoredToken = () => {
   };
 };
 
-// export const deleteStory = (storyId) => {
-//   return async (dispatch, getState) => {
-//     console.log("i am here");
-//     dispatch(appLoading());
-//     const { space, token } = selectUser(getState());
-//     console.log("whats space ", space, "and token", token);
-//     const spaceId = space.id;
-
-//     try {
-//       const response = await axios.delete(
-//         `/spaces/${spaceId}/stories/${storyId}`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-//       console.log("Story deleted?", response.data);
-//       dispatch(storyDeleteSuccess(storyId));
-//       dispatch(appDoneLoading());
-//     } catch (e) {
-//       console.error(e);
-//     }
-//   };
-// };
-
 // STORY-DELETE ACTION CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 export const storyDeleteSuccess = (storyId) => ({
   type: STORY_DELETE_SUCCESS,
@@ -171,3 +141,33 @@ export const deleteStory = (id) => {
     }
   };
 };
+
+export const addStoryToStore = (data) => {
+  return {
+    type: "ADD_STORY",
+    payload: data,
+  };
+};
+
+export function addStorytoDatabase(name, content, image, id) {
+  return async function thunk(dispatch, getState) {
+    console.log("what are the parameters", name, content, image, id);
+    // get token from the state
+    const token = selectToken(getState());
+    //if we have no token, stop
+    if (token === null) return;
+    try {
+      console.log("Im here fetching token");
+      const addedStory = await axios.post(
+        `http://localhost:4000/spaces/create/story/${id}`,
+        { name, content, image },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("now im here");
+      console.log(addedStory);
+      dispatch(addStoryToStore(addedStory.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}

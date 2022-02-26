@@ -1,4 +1,5 @@
 import axios from "axios";
+import { selectUser } from "../user/selectors"; //????????????
 
 const API_URL = "http://localhost:4000";
 
@@ -36,3 +37,33 @@ export function fetchStories(id) {
     }
   };
 }
+
+// HERE I MAKE THE ACTION FOR THE SPACE FORM!!!!!!!!!!!!!!!!!!
+export const editSpaceUser = (data) => ({
+  type: "spaces/edit",
+  payload: data,
+});
+
+export const editSpace = (title, description, backgroundColor, color) => {
+  return async (dispatch, getState) => {
+    try {
+      const user = selectUser(getState());
+      const token = localStorage.getItem("token");
+      const spaceId = user.space.id;
+      const response = await axios.patch(
+        `http://localhost:4000/spaces/edit/${spaceId}`,
+        { title, description, backgroundColor, color },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("response create story", response.data);
+
+      dispatch(editSpaceUser(response.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};

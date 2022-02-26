@@ -39,7 +39,19 @@ export default (state = initialState, action) => {
           ),
         },
       };
-
+    case "spaces/edit": {
+      return {
+        ...state,
+        space: {
+          ...state.space,
+          title: action.payload.title,
+          description: action.payload.description,
+          backgroundColor: action.payload.backgroundColor,
+          color: action.payload.color,
+          stories: [...state.space.stories],
+        },
+      };
+    }
     default:
       return state;
   }
